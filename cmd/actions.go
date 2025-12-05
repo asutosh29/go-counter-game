@@ -67,6 +67,11 @@ func Decrement(m *model, msg tea.Msg) (model, tea.Cmd) {
 
 func QuitGame(m *model, msg tea.Msg) (model, tea.Cmd) {
 	m.message = "Quitting thanks for playing!"
-	m.logMessages = append(m.logMessages, m.message)
 	return *m, tea.Quit
+}
+
+// Timer Actions
+func UpdateTimer(m *model, msg tea.Msg) (model, tea.Cmd) {
+	m.timeLeft--
+	return *m, tick()
 }

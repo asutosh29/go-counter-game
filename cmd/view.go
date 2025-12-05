@@ -10,6 +10,12 @@ func (m model) View() string {
 
 	label := labelStyle.Render("=== Counter Game ===")
 
+	timerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("205")) // Pink
+	if m.timeLeft < 5 {
+		timerStyle = timerStyle.Foreground(lipgloss.Color("#FF0000")).Bold(true)
+	}
+	timerView := timerStyle.Render(fmt.Sprintf("Time Left: %ds", m.timeLeft))
+
 	playersRow := []string{}
 	for i, player := range m.players {
 		name := labelStyle.Render(player.name)
@@ -47,7 +53,7 @@ func (m model) View() string {
 		Padding(0, 1).
 		Render(m.viewPort.View())
 
-	ui := lipgloss.JoinVertical(lipgloss.Center, label, playersRowString, footer, logView)
+	ui := lipgloss.JoinVertical(lipgloss.Center, label, timerView, playersRowString, footer, logView)
 
 	container := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()). // Nice rounded corners

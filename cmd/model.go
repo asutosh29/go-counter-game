@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,6 +17,7 @@ type model struct {
 	players       []player
 	message       string
 	currentPlayer int // will 0 or 1
+	timeLeft      time.Duration
 
 	logMessages []string
 
@@ -24,7 +27,9 @@ type model struct {
 	viewPort viewport.Model
 }
 
-func (m model) Init() tea.Cmd { return nil }
+func (m model) Init() tea.Cmd {
+	return tea.Batch(textinput.Blink, tick())
+}
 
 func initialModel() model {
 	ti := textinput.New()
@@ -43,6 +48,8 @@ func initialModel() model {
 				name: "Player 2",
 			},
 		},
+		timeLeft: 5, // Total time of the game in seconds
+
 		textInput: ti,
 		isEditing: false,
 

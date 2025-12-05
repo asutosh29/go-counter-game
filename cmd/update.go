@@ -40,6 +40,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "tab":
 			m.currentPlayer = (m.currentPlayer + 1) % (len(m.players))
 		}
+	case tickMsg:
+		if m.timeLeft > 0 {
+			return UpdateTimer(&m, msg)
+		} else {
+			return QuitGame(&m, msg)
+		}
 	}
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
