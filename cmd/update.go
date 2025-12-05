@@ -1,10 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -15,17 +11,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "enter":
-				if m.textInput.Value() != "" {
-					m.players[m.currentPlayer].name = m.textInput.Value()
-				}
-
-				m.isEditing = false
-				m.textInput.Blur()
-				return m, nil
+				return SubmitRename(&m, msg)
 			case "esc":
-				m.isEditing = false
-				m.textInput.Blur()
-				return m, nil
+				return QuitRename(&m, msg)
 			}
 		}
 		var cmds []tea.Cmd
@@ -42,44 +30,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
-			m.message = "Quitting thanks for playing!"
-			m.logMessages = append(m.logMessages, m.message)
-			return m, tea.Quit
+			return QuitGame(&m, msg)
 		case "e":
-			m.isEditing = true
-			m.textInput.Focus()
-			m.textInput.SetValue(m.players[m.currentPlayer].name)
-
-			m.message = "Editting name... press esc to exit!"
-			m.logMessages = append(m.logMessages, "Editting name")
-			return m, textinput.Blink
-
+			return StartRename(&m, msg)
 		case "up", "j":
-			if m.players[m.currentPlayer].counter < 10 {
-				m.players[m.currentPlayer].counter++
-				m.message = ""
-
-				logEntry := fmt.Sprintf("%s scored! Total: %d", m.players[m.currentPlayer].name, m.players[m.currentPlayer].counter)
-				m.logMessages = append(m.logMessages, logEntry)
-
-				m.viewPort.SetContent(strings.Join(m.logMessages, "\n"))
-				m.viewPort.GotoBottom()
-			} else {
-				m.message = "Can't go above 10..."
-			}
+			Increment(&m, msg)
 		case "down", "k":
-			if m.players[m.currentPlayer].counter > 0 {
-				m.players[m.currentPlayer].counter--
-				m.message = ""
-
-				logEntry := fmt.Sprintf("%s lost a point. Total: %d", m.players[m.currentPlayer].name, m.players[m.currentPlayer].counter)
-				m.logMessages = append(m.logMessages, logEntry)
-
-				m.viewPort.SetContent(strings.Join(m.logMessages, "\n"))
-				m.viewPort.GotoBottom()
-			} else {
-				m.message = "Can't go below 0..."
-			}
+			Decrement(&m, msg)
 		case "tab":
 			m.currentPlayer = (m.currentPlayer + 1) % (len(m.players))
 		}
